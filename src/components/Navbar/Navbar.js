@@ -4,6 +4,8 @@ import useStyles from "./styles.js";
 import FarmerLogo from "../../images/Farmer1.png";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import decode from "jwt-decode";
+
 const Navbar = () => {
      const classes = useStyles();
 
@@ -15,9 +17,14 @@ const Navbar = () => {
           dispatch({ type: "LOGOUT" });
           navigate("/");
           setUser(null);
+          window.location.reload(false);
      };
      useEffect(() => {
           const token = user?.token;
+          if (token) {
+               const decodeToken = decode(token);
+               if (decodeToken.exp * 1000 < new Date().getTime()) handleLogout();
+          }
           setUser(JSON.parse(localStorage.getItem("profile")));
      }, [location]);
      return (

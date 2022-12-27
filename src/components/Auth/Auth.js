@@ -8,14 +8,35 @@ import Icon from "./icon";
 import { gapi } from "gapi-script";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { signin, signup } from "../../actions/auth.js";
+const initialState = {
+     firstName: " ",
+     lastName: " ",
+     email: " ",
+     password: " ",
+     confirmPassword: " ",
+};
 const Auth = () => {
      const classes = useStyles();
-     const [isSignup, setIsSignup] = useState(true);
+     const [isSignup, setIsSignup] = useState(false);
      const [showPassword, setShowPassword] = useState(false);
+     const [formData, setFormData] = useState(initialState);
      const dispatch = useDispatch();
      const navigate = useNavigate();
-     const handleSubmit = () => {};
-     const handleChange = () => {};
+     const handleSubmit = (e) => {
+          e.preventDefault();
+          if (isSignup) {
+               dispatch(signup(formData, navigate));
+          } else {
+               dispatch(signin(formData, navigate));
+          }
+     };
+     const handleChange = (e) => {
+          setFormData({
+               ...formData,
+               [e.target.name]: e.target.value,
+          });
+     };
      const handleShowPassword = () => {
           setShowPassword((prevShowPassword) => !prevShowPassword);
      };
@@ -50,10 +71,10 @@ const Auth = () => {
                     <Avatar className={classes.avatar}>
                          <LockOutlinedIcon />
                     </Avatar>
-                    <Typography variant="h5">{isSignup ? "Sign In" : "Sign Up"}</Typography>
+                    <Typography variant="h5">{!isSignup ? "Sign In" : "Sign Up"}</Typography>
                     <form className={classes.form} onSubmit={handleSubmit}>
                          <Grid container spacing={2}>
-                              {!isSignup && (
+                              {isSignup && (
                                    <>
                                         <Input
                                              name="firstName"
@@ -84,7 +105,7 @@ const Auth = () => {
                                    type={showPassword ? "text" : "password"}
                                    handleShowPassword={handleShowPassword}
                               />
-                              {!isSignup && (
+                              {isSignup && (
                                    <Input
                                         name="confirmPassword"
                                         label="Repeat Password"
@@ -101,7 +122,7 @@ const Auth = () => {
                               color="primary"
                               className={classes.submit}
                          >
-                              {!isSignup ? "Sign Up" : "Sign In"}
+                              {isSignup ? "Sign Up" : "Sign In"}
                          </Button>
 
                          <GoogleLogin
@@ -126,7 +147,7 @@ const Auth = () => {
                          <Grid container justifyContent="flex-end">
                               <Grid item>
                                    <Button onClick={switchMode} color="primary">
-                                        {isSignup
+                                        {!isSignup
                                              ? "Don't have an account? Sign up"
                                              : "Already have an account? Sign in"}
                                    </Button>
